@@ -49,18 +49,6 @@ LANGUAGES = {
         "home_url": "/",
         "search_file": "search-index-en.json",
     },
-    "ru": {
-        "lang_code": "ru",
-        "site_prefix": "ru",
-        "output_dir": DOCS_DIR / "ru" / "questions",
-        "source_dir": REPO_ROOT / "ru",
-        "label": "Русский",
-        "flag": "🇷🇺",
-        "library_title": "Java Interview Questions и ответы на сайте",
-        "library_description": "Полная библиотека из 500+ ответов по Java interview: Spring Boot, SQL, Hibernate, Kafka, многопоточность, Docker, Kubernetes и архитектура.",
-        "home_url": "/ru/",
-        "search_file": "search-index-ru.json",
-    },
     "ua": {
         "lang_code": "uk",
         "site_prefix": "uk",
@@ -72,6 +60,18 @@ LANGUAGES = {
         "library_description": "Повна бібліотека відповідей для Java interview: Spring Boot, SQL, Hibernate, Kafka, багатопоточність, Docker, Kubernetes та архітектура.",
         "home_url": "/uk/",
         "search_file": "search-index-uk.json",
+    },
+    "ru": {
+        "lang_code": "ru",
+        "site_prefix": "ru",
+        "output_dir": DOCS_DIR / "ru" / "questions",
+        "source_dir": REPO_ROOT / "ru",
+        "label": "Русский",
+        "flag": "🇷🇺",
+        "library_title": "Java Interview Questions и ответы на сайте",
+        "library_description": "Полная библиотека из 500+ ответов по Java interview: Spring Boot, SQL, Hibernate, Kafka, многопоточность, Docker, Kubernetes и архитектура.",
+        "home_url": "/ru/",
+        "search_file": "search-index-ru.json",
     },
 }
 
@@ -616,6 +616,79 @@ def generate_pages(all_sections: dict[str, dict[int, Section]]) -> None:
                 )
 
     generate_search_indexes(all_sections)
+    generate_sitemap(all_sections)
+
+
+def generate_sitemap(all_sections: dict[str, dict[int, Section]]) -> None:
+    site_url_base = "https://viacheslavchernyshov.github.io/java-interview-questions-and-answers"
+    urls = []
+
+    home_alternates = [
+        {"lang": "en", "url": f"{site_url_base}/"},
+        {"lang": "uk", "url": f"{site_url_base}/uk/"},
+        {"lang": "ru", "url": f"{site_url_base}/ru/"},
+        {"lang": "x-default", "url": f"{site_url_base}/"},
+    ]
+    urls.append({"loc": f"{site_url_base}/", "priority": "1.0", "alternates": home_alternates})
+    urls.append({"loc": f"{site_url_base}/uk/", "priority": "1.0", "alternates": home_alternates})
+    urls.append({"loc": f"{site_url_base}/ru/", "priority": "1.0", "alternates": home_alternates})
+
+    lib_alternates = [
+        {"lang": "en", "url": f"{site_url_base}/questions/"},
+        {"lang": "uk", "url": f"{site_url_base}/uk/questions/"},
+        {"lang": "ru", "url": f"{site_url_base}/ru/questions/"},
+        {"lang": "x-default", "url": f"{site_url_base}/questions/"},
+    ]
+    urls.append({"loc": f"{site_url_base}/questions/", "priority": "0.9", "alternates": lib_alternates})
+    urls.append({"loc": f"{site_url_base}/uk/questions/", "priority": "0.9", "alternates": lib_alternates})
+    urls.append({"loc": f"{site_url_base}/ru/questions/", "priority": "0.9", "alternates": lib_alternates})
+
+    eng_sections = all_sections["eng"]
+    for sec_num, sec in eng_sections.items():
+        sec_alternates = [
+            {"lang": "en", "url": f"{site_url_base}{sec.url}"},
+            {"lang": "uk", "url": f"{site_url_base}{all_sections['ua'][sec_num].url}"},
+            {"lang": "ru", "url": f"{site_url_base}{all_sections['ru'][sec_num].url}"},
+            {"lang": "x-default", "url": f"{site_url_base}{sec.url}"},
+        ]
+        urls.append({"loc": f"{site_url_base}{sec.url}", "priority": "0.8", "alternates": sec_alternates})
+        urls.append({"loc": f"{site_url_base}{all_sections['ua'][sec_num].url}", "priority": "0.8", "alternates": sec_alternates})
+        urls.append({"loc": f"{site_url_base}{all_sections['ru'][sec_num].url}", "priority": "0.8", "alternates": sec_alternates})
+
+        for q in sec.questions:
+            ru_q = next((x for x in all_sections["ru"][sec_num].questions if x.position == q.position), None)
+            uk_q = next((x for x in all_sections["ua"][sec_num].questions if x.position == q.position), None)
+
+            q_alternates = [
+                {"lang": "en", "url": f"{site_url_base}{q.url}"},
+                *( [{"lang": "uk", "url": f"{site_url_base}{uk_q.url}"}] if uk_q else [] ),
+                *( [{"lang": "ru", "url": f"{site_url_base}{ru_q.url}"}] if ru_q else [] ),
+                {"lang": "x-default", "url": f"{site_url_base}{q.url}"},
+            ]
+            urls.append({"loc": f"{site_url_base}{q.url}", "priority": "0.7", "alternates": q_alternates})
+            if uk_q:
+                urls.append({"loc": f"{site_url_base}{uk_q.url}", "priority": "0.7", "alternates": q_alternates})
+            if ru_q:
+                urls.append({"loc": f"{site_url_base}{ru_q.url}", "priority": "0.7", "alternates": q_alternates})
+
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+        '        xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    ]
+    for item in urls:
+        lines.append("  <url>")
+        lines.append(f"    <loc>{item['loc']}</loc>")
+        for alt in item["alternates"]:
+            lines.append(f"    <xhtml:link rel=\"alternate\" hreflang=\"{alt['lang']}\" href=\"{alt['url']}\" />")
+        lines.append("    <changefreq>weekly</changefreq>")
+        lines.append(f"    <priority>{item['priority']}</priority>")
+        lines.append("  </url>")
+    lines.append("</urlset>")
+
+    sitemap_path = DOCS_DIR / "sitemap.xml"
+    sitemap_path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Generated sitemap with {len(urls)} URLs at {sitemap_path}")
 
 
 def main() -> None:

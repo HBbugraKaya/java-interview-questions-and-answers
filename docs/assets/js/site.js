@@ -18,6 +18,8 @@
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(THEME_KEY, theme);
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', theme === 'light' ? '#f8fafc' : '#090d16');
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
       themeBtn.innerHTML = theme === 'light'
@@ -77,6 +79,7 @@
     const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
     const sidebar = document.getElementById('site-sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
+    const closeDrawerBtn = document.getElementById('sidebar-close-btn');
 
     function toggleMobileSidebar(open) {
       if (!sidebar) return;
@@ -98,25 +101,94 @@
       });
     }
 
+    if (closeDrawerBtn) {
+      closeDrawerBtn.addEventListener('click', () => toggleMobileSidebar(false));
+    }
+
     if (backdrop) {
       backdrop.addEventListener('click', () => toggleMobileSidebar(false));
     }
 
-    // Scroll active item in sidebar into view
+    // Smoothly scroll section to the top of the sidebar under the header
+    function scrollSectionToTop(targetSection, prevExpanded = null) {
+      if (!sidebar || !targetSection) return;
+      const sidebarTitle = sidebar.querySelector('.sidebar-title');
+      const titleHeight = sidebarTitle ? sidebarTitle.offsetHeight : 45;
+      const sidebarRect = sidebar.getBoundingClientRect();
+      const targetRect = targetSection.getBoundingClientRect();
+
+      let heightLost = 0;
+      if (prevExpanded && prevExpanded !== targetSection) {
+        // If prevExpanded is placed before targetSection in DOM, its collapse reduces target's future top
+        if (prevExpanded.compareDocumentPosition(targetSection) & Node.DOCUMENT_POSITION_FOLLOWING) {
+          const prevWrapper = prevExpanded.querySelector('.sidebar-questions-wrapper');
+          if (prevWrapper) {
+            heightLost = prevWrapper.offsetHeight;
+          }
+        }
+      }
+
+      const currentOffsetFromSidebar = targetRect.top - sidebarRect.top;
+      const absoluteTop = sidebar.scrollTop + currentOffsetFromSidebar;
+      const finalAbsoluteTop = absoluteTop - heightLost;
+      const targetScrollTop = Math.max(0, finalAbsoluteTop - titleHeight - 6);
+
+      sidebar.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth'
+      });
+    }
+
+    // Scroll active item/section safely into view on page load
+    const activeSection = sidebar ? sidebar.querySelector('.sidebar-section-item.active') : null;
     const activeSidebarItem = document.querySelector('.sidebar-q-link.active');
-    if (activeSidebarItem) {
+    if (activeSection && sidebar) {
+      // Align active section to the top on page load
       setTimeout(() => {
-        activeSidebarItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        const sidebarTitle = sidebar.querySelector('.sidebar-title');
+        const titleHeight = sidebarTitle ? sidebarTitle.offsetHeight : 45;
+        const sidebarRect = sidebar.getBoundingClientRect();
+        const targetRect = activeSection.getBoundingClientRect();
+        const targetScrollTop = Math.max(0, sidebar.scrollTop + (targetRect.top - sidebarRect.top) - titleHeight - 6);
+        sidebar.scrollTop = targetScrollTop;
+
+        // If the active question is deep inside and scrolled below viewport, ensure it's visible
+        if (activeSidebarItem) {
+          const itemRect = activeSidebarItem.getBoundingClientRect();
+          if (itemRect.bottom > sidebarRect.bottom - 20) {
+            sidebar.scrollTop += (itemRect.bottom - sidebarRect.bottom + 40);
+          }
+        }
       }, 100);
     }
 
-    // Sidebar Accordion for Sections
+    // Sidebar Accordion with Mutual Collapse and Smooth Scroll-To-Top
     document.querySelectorAll('.sidebar-section-header').forEach(header => {
-      header.addEventListener('click', (e) => {
-        // If clicking the arrow or toggle
-        const parent = header.closest('.sidebar-section-item');
-        if (parent) {
-          parent.classList.toggle('expanded');
+      header.addEventListener('click', () => {
+        const sectionItem = header.closest('.sidebar-section-item');
+        if (!sectionItem || !sidebar) return;
+
+        const isCurrentlyExpanded = sectionItem.classList.contains('expanded');
+
+        if (isCurrentlyExpanded) {
+          // If already expanded, collapse it
+          sectionItem.classList.remove('expanded');
+          header.setAttribute('aria-expanded', 'false');
+        } else {
+          // Mutual collapse: collapse any other currently open section
+          const prevExpanded = sidebar.querySelector('.sidebar-section-item.expanded');
+          if (prevExpanded && prevExpanded !== sectionItem) {
+            prevExpanded.classList.remove('expanded');
+            const prevHeader = prevExpanded.querySelector('.sidebar-section-header');
+            if (prevHeader) prevHeader.setAttribute('aria-expanded', 'false');
+          }
+
+          // Expand the clicked section
+          sectionItem.classList.add('expanded');
+          header.setAttribute('aria-expanded', 'true');
+
+          // Smoothly scroll the newly opened section to the top of the sidebar under the header
+          scrollSectionToTop(sectionItem, prevExpanded);
         }
       });
     });
@@ -174,47 +246,60 @@
       });
     });
 
-    // --- On-Page Level Navigation / Quick Anchors ---
-    const contentBody = document.querySelector('.markdown-body');
-    if (contentBody) {
+    // --- On-Page Level Navigation / Quick Anchors (Questions only) ---
+    const anchorsContainer = document.getElementById('level-anchors');
+    const contentBody = document.querySelector('.content-article .markdown-body');
+    const currentLang = document.documentElement.lang || 'en';
+
+    if (anchorsContainer && contentBody) {
       const headings = contentBody.querySelectorAll('h2, h3');
-      const anchorsContainer = document.getElementById('level-anchors');
-      if (anchorsContainer && headings.length > 0) {
+      const seenLevels = new Set();
+      const chips = [];
+
+      headings.forEach(h => {
+        const text = h.innerText.trim();
+        let levelKey = null;
+        let label = '';
+        let chipClass = '';
+
+        if (/junior/i.test(text) || text.includes('🟢')) {
+          levelKey = 'junior';
+          label = '🟢 Junior';
+          chipClass = 'chip-junior';
+        } else if (/middle/i.test(text) || text.includes('🟡')) {
+          levelKey = 'middle';
+          label = '🟡 Middle';
+          chipClass = 'chip-middle';
+        } else if (/senior/i.test(text) || text.includes('🔴')) {
+          levelKey = 'senior';
+          label = '🔴 Senior';
+          chipClass = 'chip-senior';
+        } else if (/шпаргалка|cheat/i.test(text) || text.includes('🎯')) {
+          levelKey = 'cheat';
+          label = (currentLang === 'ru' || currentLang === 'uk') ? '🎯 Шпаргалка' : '🎯 Cheat Sheet';
+          chipClass = 'chip-cheat';
+        }
+
+        if (levelKey && !seenLevels.has(levelKey)) {
+          seenLevels.add(levelKey);
+          if (!h.id) {
+            h.id = 'section-' + levelKey;
+          }
+          chips.push({ id: h.id, label, chipClass });
+        }
+      });
+
+      if (chips.length > 1) {
         const list = document.createElement('div');
         list.className = 'level-chips-row';
-        headings.forEach(h => {
-          const text = h.innerText.trim();
-          let chipClass = '';
-          let icon = '';
-          if (text.includes('Junior') || text.includes('🟢')) {
-            chipClass = 'chip-junior';
-            icon = '🟢';
-          } else if (text.includes('Middle') || text.includes('🟡')) {
-            chipClass = 'chip-middle';
-            icon = '🟡';
-          } else if (text.includes('Senior') || text.includes('🔴')) {
-            chipClass = 'chip-senior';
-            icon = '🔴';
-          } else if (text.includes('Шпаргалка') || text.includes('Cheat') || text.includes('🎯')) {
-            chipClass = 'chip-cheat';
-            icon = '🎯';
-          }
-
-          if (chipClass) {
-            // Ensure ID
-            if (!h.id) {
-              h.id = 'heading-' + Math.random().toString(36).substr(2, 9);
-            }
-            const link = document.createElement('a');
-            link.href = '#' + h.id;
-            link.className = `level-chip ${chipClass}`;
-            link.innerHTML = `<span>${text}</span>`;
-            list.appendChild(link);
-          }
+        chips.forEach(c => {
+          const a = document.createElement('a');
+          a.href = '#' + c.id;
+          a.className = `level-chip ${c.chipClass}`;
+          a.textContent = c.label;
+          list.appendChild(a);
         });
-        if (list.children.length > 0) {
-          anchorsContainer.appendChild(list);
-        }
+        anchorsContainer.appendChild(list);
       }
     }
 
@@ -224,37 +309,38 @@
 
   // --- Search Implementation ---
   let searchIndex = null;
-  let isSearchLoading = false;
+  let searchIndexPromise = null;
 
-  async function loadSearchIndex(lang) {
-    if (searchIndex) return searchIndex;
-    if (isSearchLoading) return;
-    isSearchLoading = true;
+  function loadSearchIndex(lang) {
+    if (searchIndex) return Promise.resolve(searchIndex);
+    if (searchIndexPromise) return searchIndexPromise;
 
-    let searchFile = 'search-index-en.json';
-    if (lang === 'ru') searchFile = 'search-index-ru.json';
-    else if (lang === 'uk') searchFile = 'search-index-uk.json';
+    searchIndexPromise = (async () => {
+      let searchFile = 'search-index-en.json';
+      if (lang === 'ru') searchFile = 'search-index-ru.json';
+      else if (lang === 'uk') searchFile = 'search-index-uk.json';
 
-    try {
-      // Find base URL from current path
       const baseTag = document.querySelector('meta[name="baseurl"]');
-      const prefix = baseTag ? baseTag.getAttribute('content') : '';
-      const url = (prefix + '/assets/data/' + searchFile).replace(/\/+/g, '/');
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      searchIndex = await response.json();
-    } catch (e) {
-      console.warn('Could not load search index directly, trying root path:', e);
-      try {
-        const response = await fetch('/assets/data/' + searchFile);
-        searchIndex = await response.json();
-      } catch (err) {
-        console.error('Failed to load search index:', err);
+      const prefix = baseTag ? (baseTag.getAttribute('content') || '') : '';
+      const candidates = [
+        (prefix + '/assets/data/' + searchFile).replace(/\/+/g, '/'),
+        '/assets/data/' + searchFile,
+        '../assets/data/' + searchFile,
+      ];
+
+      for (const url of candidates) {
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            searchIndex = await response.json();
+            return searchIndex;
+          }
+        } catch (err) {}
       }
-    } finally {
-      isSearchLoading = false;
-    }
-    return searchIndex;
+      return null;
+    })();
+
+    return searchIndexPromise;
   }
 
   function initSearch() {
@@ -307,11 +393,48 @@
       }
     });
 
+    // Keyboard navigation in search results
+    let selectedIndex = -1;
+
+    function updateSelection(items) {
+      items.forEach((item, idx) => {
+        if (idx === selectedIndex) {
+          item.classList.add('selected');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+    }
+
+    input.addEventListener('keydown', (e) => {
+      const items = Array.from(resultsContainer.querySelectorAll('.search-result-item'));
+      if (!items.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % items.length;
+        updateSelection(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+        updateSelection(items);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < items.length) {
+          window.location.href = items[selectedIndex].getAttribute('href');
+        } else if (items.length > 0) {
+          window.location.href = items[0].getAttribute('href');
+        }
+      }
+    });
+
     // Search Input handling
     let debounceTimer = null;
     input.addEventListener('input', () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(async () => {
+        selectedIndex = -1;
         const query = input.value.trim().toLowerCase();
         if (!query) {
           resultsContainer.innerHTML = '<div class="search-empty-state">Type a keyword, topic, or question...</div>';
@@ -341,10 +464,10 @@
         const topMatches = matches.slice(0, 25);
         let html = `<div class="search-count-header">Found <strong>${matches.length}</strong> matching questions:</div>`;
 
-        topMatches.forEach(item => {
+        topMatches.forEach((item, idx) => {
           const highlightedTitle = highlightMatch(item.title, queryTokens);
           html += `
-            <a class="search-result-item" href="${item.url}">
+            <a class="search-result-item" href="${item.url}" data-index="${idx}">
               <div class="search-item-header">
                 <span class="search-item-badge">${item.icon} Section ${item.secNumber}: ${escapeHtml(item.secTitle)}</span>
                 <span class="search-item-num">#${item.pos}</span>

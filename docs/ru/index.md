@@ -7,10 +7,10 @@ image: /assets/social-preview/github-social-preview.png
 alternates:
   - lang: en
     url: /
-  - lang: ru
-    url: /ru/
   - lang: uk
     url: /uk/
+  - lang: ru
+    url: /ru/
   - lang: x-default
     url: /
 ---
@@ -29,7 +29,7 @@ alternates:
 
   <div class="stats-grid">
     <div class="stat-box">
-      <span class="stat-value">507</span>
+      <span class="stat-value">516</span>
       <span class="stat-label">Вопросов и ответов</span>
     </div>
     <div class="stat-box">

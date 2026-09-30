@@ -18,12 +18,6 @@ JavaInterview_v2/
 │   └── workflows/
 │       └── pages.yml            # CI/CD: push master → generate pages → Jekyll → deploy
 │
-├── ru/                          # 🇷🇺 Русский контент (528 .md файлов)
-│   ├── README.md                # Оглавление русской секции
-│   └── {1..20}. {Название}/     # 20 тематических секций
-│       ├── 00. Навигатор по разделу.md
-│       └── {1..N}. {Вопрос}.md
-│
 ├── eng/                         # 🇬🇧 Английский контент (528 .md файлов)
 │   ├── README.md
 │   └── {1..20}. {Section Name}/
@@ -36,11 +30,17 @@ JavaInterview_v2/
 │       ├── 00. Навігатор по розділу.md
 │       └── {1..N}. {Питання}.md
 │
+├── ru/                          # 🇷🇺 Русский контент (528 .md файлов)
+│   ├── README.md                # Оглавление русской секции
+│   └── {1..20}. {Название}/     # 20 тематических секций
+│       ├── 00. Навигатор по разделу.md
+│       └── {1..N}. {Вопрос}.md
+│
 ├── docs/                        # GitHub Pages (Jekyll сайт)
 │   ├── _config.yml              # Jekyll конфиг
 │   ├── index.md                 # Landing page (ENG)
-│   ├── ru/index.md              # Landing page (RU)
 │   ├── uk/index.md              # Landing page (UA)
+│   ├── ru/index.md              # Landing page (RU)
 │   ├── 404.html
 │   ├── robots.txt
 │   ├── googleb845076b8b1fd464.html  # Google verification
@@ -55,8 +55,8 @@ JavaInterview_v2/
 │   │   ├── sql-postgresql-interview-questions.md
 │   │   └── ... (по одной на секцию)
 │   ├── questions/               # ⚠️ .gitignore — генерируется скриптом
-│   ├── ru/questions/            # ⚠️ .gitignore — генерируется скриптом
-│   └── uk/questions/            # ⚠️ .gitignore — генерируется скриптом
+│   ├── uk/questions/            # ⚠️ .gitignore — генерируется скриптом
+│   └── ru/questions/            # ⚠️ .gitignore — генерируется скриптом
 │
 └── scripts/
     └── generate_site_pages.py   # Генерирует answer pages из MD → docs/questions/

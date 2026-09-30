@@ -5,13 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#090d16">
     <meta name="baseurl" content="{{ site.baseurl }}">
-    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}?v=2.2">
     {% if page.alternates %}
       {% for alt in page.alternates %}
     <link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.url | absolute_url }}">
       {% endfor %}
     {% endif %}
     {% seo %}
+
+    {% if page.kind == 'question' %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": {{ page.title | jsonify }},
+      "description": {{ page.description | jsonify }},
+      "inLanguage": {{ page.lang | default: "en" | jsonify }},
+      "articleSection": {{ page.section_title | default: "Java" | jsonify }},
+      "author": {
+        "@type": "Person",
+        "name": "Viacheslav Chernyshov",
+        "url": "https://github.com/ViacheslavChernyshov"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ home_url | default: '/' | absolute_url }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ page.section_title | default: "Section" | jsonify }},
+          "item": "{{ page.section_url | default: '' | absolute_url }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ page.title | jsonify }},
+          "item": "{{ page.url | default: '' | absolute_url }}"
+        }
+      ]
+    }
+    </script>
+    {% endif %}
   </head>
   <body>
     {% assign answers_url = '/questions/' %}
@@ -25,8 +70,12 @@
     {% assign previous_label = 'Previous' %}
     {% assign next_label = 'Next' %}
     {% assign questions_count_label = 'questions' %}
+    {% assign search_label = 'Search 500+ questions...' %}
     {% assign search_placeholder = 'Search 500+ questions... (Ctrl+K)' %}
     {% assign sidebar_title = 'Table of Contents' %}
+    {% assign en_url = '/questions/' %}
+    {% assign uk_url = '/uk/questions/' %}
+    {% assign ru_url = '/ru/questions/' %}
 
     {% if page.lang == 'ru' %}
       {% assign answers_url = '/ru/questions/' %}
@@ -40,6 +89,7 @@
       {% assign previous_label = 'Назад' %}
       {% assign next_label = 'Далее' %}
       {% assign questions_count_label = 'вопросов' %}
+      {% assign search_label = 'Поиск по 500+ вопросам...' %}
       {% assign search_placeholder = 'Поиск по 500+ вопросам... (Ctrl+K)' %}
       {% assign sidebar_title = 'Содержание разделов' %}
     {% elsif page.lang == 'uk' %}
@@ -54,8 +104,17 @@
       {% assign previous_label = 'Назад' %}
       {% assign next_label = 'Далі' %}
       {% assign questions_count_label = 'питань' %}
+      {% assign search_label = 'Пошук по 500+ питанням...' %}
       {% assign search_placeholder = 'Пошук по 500+ питанням... (Ctrl+K)' %}
       {% assign sidebar_title = 'Зміст розділів' %}
+    {% endif %}
+
+    {% if page.alternates %}
+      {% for alt in page.alternates %}
+        {% if alt.lang == 'en' %}{% assign en_url = alt.url %}{% endif %}
+        {% if alt.lang == 'uk' %}{% assign uk_url = alt.url %}{% endif %}
+        {% if alt.lang == 'ru' %}{% assign ru_url = alt.url %}{% endif %}
+      {% endfor %}
     {% endif %}
 
     <header class="site-header">
@@ -74,14 +133,14 @@
         <div class="header-actions">
           <button type="button" class="search-trigger-btn" id="search-trigger-btn" aria-label="Open search">
             <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>{{ answers_label }}</span>
+            <span class="search-trigger-text">{{ search_label }}</span>
             <span class="search-kbd">Ctrl K</span>
           </button>
 
           <nav class="lang-selector" aria-label="Language selector">
-            <a class="lang-pill {% if page.lang == 'en' %}active{% endif %}" href="{{ '/' | relative_url }}">🇬🇧 EN</a>
-            <a class="lang-pill {% if page.lang == 'ru' %}active{% endif %}" href="{{ '/ru/' | relative_url }}">🇷🇺 RU</a>
-            <a class="lang-pill {% if page.lang == 'uk' %}active{% endif %}" href="{{ '/uk/' | relative_url }}">🇺🇦 UK</a>
+            <a class="lang-pill {% if page.lang == 'en' %}active{% endif %}" href="{{ en_url | relative_url }}" title="English version"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><path fill="#012169" d="M0 0h640v480H0z"/><path fill="#FFF" d="m75 0 244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0h75z"/><path fill="#C8102E" d="m424 288 216 159v33h-44L368 300l56-12zm-208-96L0 33V0h44l228 160-56 32zm384-192 40 30v4l-190 142h-48L598 0h2zm-598 448 40-30h48L64 480H0v-32z"/><path fill="#FFF" d="M240 0v480h160V0H240zM0 160v160h640V160H0z"/><path fill="#C8102E" d="M266 0v480h108V0H266zM0 186v108h640V186H0z"/></svg><span>EN</span></a>
+            <a class="lang-pill {% if page.lang == 'uk' %}active{% endif %}" href="{{ uk_url | relative_url }}" title="Українська версія"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><g fill-rule="evenodd" stroke-width="1pt"><path fill="#ffd700" d="M0 240h640v240H0z"/><path fill="#0057b7" d="M0 0h640v240H0z"/></g></svg><span>UK</span></a>
+            <a class="lang-pill {% if page.lang == 'ru' %}active{% endif %}" href="{{ ru_url | relative_url }}" title="Русская версия"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><g fill-rule="evenodd" stroke-width="1pt"><path fill="#fff" d="M0 0h640v160H0z"/><path fill="#0039a6" d="M0 160h640v160H0z"/><path fill="#d52b1e" d="M0 320h640v160H0z"/></g></svg><span>RU</span></a>
           </nav>
 
           <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="Toggle theme">
@@ -100,29 +159,40 @@
       <aside class="site-sidebar" id="site-sidebar">
         <div class="sidebar-title">
           <span>{{ sidebar_title }}</span>
-          <span class="sidebar-sec-badge">20 topics</span>
+          <div class="sidebar-header-right">
+            <span class="sidebar-sec-badge">20 topics</span>
+            <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close sidebar">✕</button>
+          </div>
         </div>
 
         {% if page.sidebar_sections %}
           {% for sec in page.sidebar_sections %}
-            <div class="sidebar-section-item {% if sec.is_current %}active expanded{% endif %}">
-              <a class="sidebar-section-header {% if sec.is_current and page.kind == 'section' %}active{% endif %}" href="{{ sec.url | relative_url }}">
+            <div class="sidebar-section-item {% if sec.is_current %}active expanded{% endif %}" data-section-num="{{ sec.number }}">
+              <button type="button" class="sidebar-section-header {% if sec.is_current and page.kind == 'section' %}active{% endif %}" aria-expanded="{% if sec.is_current %}true{% else %}false{% endif %}" title="{{ sec.number }}. {{ sec.label }}">
                 <span class="sidebar-sec-info">
-                  <span>{{ sec.icon }}</span>
-                  <span>{{ sec.number }}. {{ sec.label }}</span>
+                  <span class="sidebar-sec-icon">{{ sec.icon }}</span>
+                  <span class="sidebar-sec-label">{{ sec.number }}. {{ sec.label }}</span>
                 </span>
-                <span class="sidebar-sec-badge">{{ sec.count }}</span>
-              </a>
+                <span class="sidebar-sec-meta">
+                  <span class="sidebar-sec-badge">{{ sec.count }}</span>
+                  <svg class="sidebar-sec-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+              </button>
               {% if sec.questions %}
-                <ul class="sidebar-questions-list">
-                  {% for q in sec.questions %}
-                    <li>
-                      <a class="sidebar-q-link {% if q.is_current %}active{% endif %}" href="{{ q.url | relative_url }}">
-                        {{ q.position }}. {{ q.title }}
-                      </a>
-                    </li>
-                  {% endfor %}
-                </ul>
+                <div class="sidebar-questions-wrapper">
+                  <div class="sidebar-questions-inner">
+                    <ul class="sidebar-questions-list">
+                      {% for q in sec.questions %}
+                        <li>
+                          <a class="sidebar-q-link {% if q.is_current %}active{% endif %}" href="{{ q.url | relative_url }}" title="{{ q.position }}. {{ q.title | escape }}">
+                            <span class="sidebar-q-num">{{ q.position }}.</span>
+                            <span class="sidebar-q-title">{{ q.title | escape }}</span>
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
               {% endif %}
             </div>
           {% endfor %}
@@ -141,13 +211,13 @@
             <span class="breadcrumbs-sep">/</span>
           {% endif %}
           {% if page.kind == 'question' %}
-            <a href="{{ page.section_url | relative_url }}">{{ page.section_title }}</a>
+            <a href="{{ page.section_url | relative_url }}">{{ page.section_title | escape }}</a>
             <span class="breadcrumbs-sep">/</span>
             <span>#{{ page.question_number }}</span>
           {% elsif page.kind == 'section' %}
-            <span>{{ page.section_title }}</span>
+            <span>{{ page.section_title | escape }}</span>
           {% else %}
-            <span>{{ page.title }}</span>
+            <span>{{ page.title | escape }}</span>
           {% endif %}
         </nav>
 
@@ -162,7 +232,7 @@
             {% endif %}
           </div>
 
-          <h1 class="article-title">{{ page.title }}</h1>
+          <h1 class="article-title">{{ page.title | escape }}</h1>
 
           {% if page.description %}
             <p class="article-lede">{{ page.description }}</p>
@@ -170,9 +240,6 @@
 
           <div class="article-meta-row">
             <div class="meta-group">
-              {% if page.language_label %}
-                <span class="meta-pill">{{ page.language_flag }} {{ page.language_label }}</span>
-              {% endif %}
               {% if page.kind == 'question' and page.section_title %}
                 <a class="meta-pill meta-pill-link" href="{{ page.section_url | relative_url }}">{{ page.icon }} {{ page.section_title }}</a>
               {% endif %}
@@ -181,20 +248,11 @@
               {% endif %}
             </div>
 
-            {% if page.alternates %}
-              <div class="language-switch-bar">
-                <span>{{ versions_label }}</span>
-                {% for alt in page.alternates %}
-                  {% unless alt.lang == 'x-default' %}
-                    <a class="meta-pill meta-pill-link" href="{{ alt.url | relative_url }}">{{ alt.flag }} {{ alt.label }}</a>
-                  {% endunless %}
-                {% endfor %}
-              </div>
+            {% if page.kind == 'question' %}
+              <!-- Level Quick Anchors Container (Filled dynamically by site.js) -->
+              <div class="level-anchors-container" id="level-anchors"></div>
             {% endif %}
           </div>
-
-          <!-- Level Quick Anchors Container (Filled dynamically by site.js) -->
-          <div class="level-anchors-container" id="level-anchors"></div>
         </header>
 
         <div class="markdown-body">
@@ -206,13 +264,13 @@
             {% if page.prev_url %}
               <a class="pager-card prev" href="{{ page.prev_url | relative_url }}">
                 <span class="pager-direction">← {{ previous_label }}</span>
-                <span class="pager-title">{{ page.prev_title }}</span>
+                <span class="pager-title">{{ page.prev_title | escape }}</span>
               </a>
             {% endif %}
             {% if page.next_url %}
               <a class="pager-card next" href="{{ page.next_url | relative_url }}">
                 <span class="pager-direction">{{ next_label }} →</span>
-                <span class="pager-title">{{ page.next_title }}</span>
+                <span class="pager-title">{{ page.next_title | escape }}</span>
               </a>
             {% endif %}
           </nav>
@@ -247,7 +305,7 @@
 
     <footer class="site-footer">
       <p>☕ <strong>Java Interview Questions and Answers</strong> · Open Source Knowledge Portal</p>
-      <p>Built from the <a href="{{ site.github.repository_url | default: 'https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers' }}" target="_blank" rel="noopener">GitHub repository</a>. Fully synced across English, Russian, and Ukrainian.</p>
+      <p>Built from the <a href="{{ site.github.repository_url | default: 'https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers' }}" target="_blank" rel="noopener">GitHub repository</a>. Fully synced across English, Ukrainian, and Russian.</p>
     </footer>
 
     <script src="{{ '/assets/js/site.js' | relative_url }}"></script>

@@ -1,0 +1,30 @@
+{
+  "name": "javainterview_v2",
+  "version": "1.0.0",
+  "description": "> **500+ Java interview questions and answers** for **Junior, Middle, and Senior Java backend developers**.\r > Covers **Spring Boot, Hibernate / JPA, SQL, PostgreSQL, Kafka, Docker, Kubernetes, Collections, Concurrency, Stream API, REST / HTTP, JVM memory, design patterns, transactions, microservices**, and other high-frequency backend interview topics.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.js",
+    "serve": "node scripts/serve.js",
+    "generate": "node scripts/generate_site_pages.js",
+    "build": "node scripts/generate_site_pages.js",
+    "test": "node scripts/check_all_sections_alignment.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers/issues"
+  },
+  "homepage": "https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers#readme",
+  "dependencies": {
+    "js-yaml": "^5.4.2",
+    "liquidjs": "^10.29.0",
+    "marked": "^18.0.14"
+  }
+}

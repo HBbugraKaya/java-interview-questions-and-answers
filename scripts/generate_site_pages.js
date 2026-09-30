@@ -44,18 +44,6 @@ const LANGUAGES = {
     home_url: '/',
     search_file: 'search-index-en.json',
   },
-  ru: {
-    lang_code: 'ru',
-    site_prefix: 'ru',
-    output_dir: path.join(DOCS_DIR, 'ru', 'questions'),
-    source_dir: path.join(REPO_ROOT, 'ru'),
-    label: 'Русский',
-    flag: '🇷🇺',
-    library_title: 'Java Interview Questions и ответы на сайте',
-    library_description: 'Полная библиотека из 500+ ответов по Java interview: Spring Boot, SQL, Hibernate, Kafka, многопоточность, Docker, Kubernetes и архитектура.',
-    home_url: '/ru/',
-    search_file: 'search-index-ru.json',
-  },
   ua: {
     lang_code: 'uk',
     site_prefix: 'uk',
@@ -67,6 +55,18 @@ const LANGUAGES = {
     library_description: 'Повна бібліотека відповідей для Java interview: Spring Boot, SQL, Hibernate, Kafka, багатопоточність, Docker, Kubernetes та архітектура.',
     home_url: '/uk/',
     search_file: 'search-index-uk.json',
+  },
+  ru: {
+    lang_code: 'ru',
+    site_prefix: 'ru',
+    output_dir: path.join(DOCS_DIR, 'ru', 'questions'),
+    source_dir: path.join(REPO_ROOT, 'ru'),
+    label: 'Русский',
+    flag: '🇷🇺',
+    library_title: 'Java Interview Questions и ответы на сайте',
+    library_description: 'Полная библиотека из 500+ ответов по Java interview: Spring Boot, SQL, Hibernate, Kafka, многопоточность, Docker, Kubernetes и архитектура.',
+    home_url: '/ru/',
+    search_file: 'search-index-ru.json',
   },
 };
 
@@ -608,6 +608,85 @@ function generatePages(allSections) {
   }
 
   generateSearchIndexes(allSections);
+  generateSitemap(allSections);
+}
+
+function generateSitemap(allSections) {
+  const SITE_URL = 'https://viacheslavchernyshov.github.io/java-interview-questions-and-answers';
+  const urls = [];
+
+  const homeAlternates = [
+    { lang: 'en', url: `${SITE_URL}/` },
+    { lang: 'uk', url: `${SITE_URL}/uk/` },
+    { lang: 'ru', url: `${SITE_URL}/ru/` },
+    { lang: 'x-default', url: `${SITE_URL}/` },
+  ];
+
+  urls.push({ loc: `${SITE_URL}/`, priority: '1.0', alternates: homeAlternates });
+  urls.push({ loc: `${SITE_URL}/uk/`, priority: '1.0', alternates: homeAlternates });
+  urls.push({ loc: `${SITE_URL}/ru/`, priority: '1.0', alternates: homeAlternates });
+
+  const libAlternates = [
+    { lang: 'en', url: `${SITE_URL}/questions/` },
+    { lang: 'uk', url: `${SITE_URL}/uk/questions/` },
+    { lang: 'ru', url: `${SITE_URL}/ru/questions/` },
+    { lang: 'x-default', url: `${SITE_URL}/questions/` },
+  ];
+
+  urls.push({ loc: `${SITE_URL}/questions/`, priority: '0.9', alternates: libAlternates });
+  urls.push({ loc: `${SITE_URL}/uk/questions/`, priority: '0.9', alternates: libAlternates });
+  urls.push({ loc: `${SITE_URL}/ru/questions/`, priority: '0.9', alternates: libAlternates });
+
+  const engSections = allSections.eng;
+  for (const [secNum, sec] of Object.entries(engSections)) {
+    const secAlternates = [
+      { lang: 'en', url: `${SITE_URL}${sec.url}` },
+      { lang: 'uk', url: `${SITE_URL}${allSections.ua[secNum].url}` },
+      { lang: 'ru', url: `${SITE_URL}${allSections.ru[secNum].url}` },
+      { lang: 'x-default', url: `${SITE_URL}${sec.url}` },
+    ];
+
+    urls.push({ loc: `${SITE_URL}${sec.url}`, priority: '0.8', alternates: secAlternates });
+    urls.push({ loc: `${SITE_URL}${allSections.ua[secNum].url}`, priority: '0.8', alternates: secAlternates });
+    urls.push({ loc: `${SITE_URL}${allSections.ru[secNum].url}`, priority: '0.8', alternates: secAlternates });
+
+    for (const q of sec.questions) {
+      const ruQ = allSections.ru[secNum]?.questions.find(x => x.position === q.position);
+      const ukQ = allSections.ua[secNum]?.questions.find(x => x.position === q.position);
+
+      const qAlternates = [
+        { lang: 'en', url: `${SITE_URL}${q.url}` },
+        ...(ukQ ? [{ lang: 'uk', url: `${SITE_URL}${ukQ.url}` }] : []),
+        ...(ruQ ? [{ lang: 'ru', url: `${SITE_URL}${ruQ.url}` }] : []),
+        { lang: 'x-default', url: `${SITE_URL}${q.url}` },
+      ];
+
+      urls.push({ loc: `${SITE_URL}${q.url}`, priority: '0.7', alternates: qAlternates });
+      if (ukQ) urls.push({ loc: `${SITE_URL}${ukQ.url}`, priority: '0.7', alternates: qAlternates });
+      if (ruQ) urls.push({ loc: `${SITE_URL}${ruQ.url}`, priority: '0.7', alternates: qAlternates });
+    }
+  }
+
+  const xmlLines = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+    '        xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+  ];
+
+  for (const item of urls) {
+    xmlLines.push('  <url>');
+    xmlLines.push(`    <loc>${item.loc}</loc>`);
+    for (const alt of item.alternates) {
+      xmlLines.push(`    <xhtml:link rel="alternate" hreflang="${alt.lang}" href="${alt.url}" />`);
+    }
+    xmlLines.push('    <changefreq>weekly</changefreq>');
+    xmlLines.push(`    <priority>${item.priority}</priority>`);
+    xmlLines.push('  </url>');
+  }
+
+  xmlLines.push('</urlset>');
+  fs.writeFileSync(path.join(DOCS_DIR, 'sitemap.xml'), xmlLines.join('\n'), 'utf-8');
+  console.log(`Generated sitemap with ${urls.length} URLs at ${path.join(DOCS_DIR, 'sitemap.xml')}`);
 }
 
 function main() {

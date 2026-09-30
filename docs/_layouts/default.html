@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#090d16">
     <meta name="baseurl" content="{{ site.baseurl }}">
-    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}?v=2.2">
     {% if page.alternates %}
       {% for alt in page.alternates %}
     <link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.url | absolute_url }}">
@@ -17,17 +18,32 @@
     {% assign answers_url = '/questions/' %}
     {% assign home_url = '/' %}
     {% assign answers_label = 'Library' %}
+    {% assign search_label = 'Search 500+ questions...' %}
     {% assign search_placeholder = 'Search 500+ questions... (Ctrl+K)' %}
+    {% assign en_url = '/' %}
+    {% assign uk_url = '/uk/' %}
+    {% assign ru_url = '/ru/' %}
+
     {% if page.lang == 'ru' %}
       {% assign answers_url = '/ru/questions/' %}
       {% assign home_url = '/ru/' %}
       {% assign answers_label = 'Библиотека' %}
+      {% assign search_label = 'Поиск по 500+ вопросам...' %}
       {% assign search_placeholder = 'Поиск по 500+ вопросам... (Ctrl+K)' %}
     {% elsif page.lang == 'uk' %}
       {% assign answers_url = '/uk/questions/' %}
       {% assign home_url = '/uk/' %}
       {% assign answers_label = 'Бібліотека' %}
+      {% assign search_label = 'Пошук по 500+ питанням...' %}
       {% assign search_placeholder = 'Пошук по 500+ питанням... (Ctrl+K)' %}
+    {% endif %}
+
+    {% if page.alternates %}
+      {% for alt in page.alternates %}
+        {% if alt.lang == 'en' %}{% assign en_url = alt.url %}{% endif %}
+        {% if alt.lang == 'uk' %}{% assign uk_url = alt.url %}{% endif %}
+        {% if alt.lang == 'ru' %}{% assign ru_url = alt.url %}{% endif %}
+      {% endfor %}
     {% endif %}
 
     <header class="site-header">
@@ -43,14 +59,14 @@
         <div class="header-actions">
           <button type="button" class="search-trigger-btn" id="search-trigger-btn" aria-label="Open search">
             <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>{{ answers_label }}</span>
+            <span class="search-trigger-text">{{ search_label }}</span>
             <span class="search-kbd">Ctrl K</span>
           </button>
 
           <nav class="lang-selector" aria-label="Language selector">
-            <a class="lang-pill {% if page.lang == 'en' %}active{% endif %}" href="{{ '/' | relative_url }}">🇬🇧 EN</a>
-            <a class="lang-pill {% if page.lang == 'ru' %}active{% endif %}" href="{{ '/ru/' | relative_url }}">🇷🇺 RU</a>
-            <a class="lang-pill {% if page.lang == 'uk' %}active{% endif %}" href="{{ '/uk/' | relative_url }}">🇺🇦 UK</a>
+            <a class="lang-pill {% if page.lang == 'en' %}active{% endif %}" href="{{ en_url | relative_url }}" title="English version"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><path fill="#012169" d="M0 0h640v480H0z"/><path fill="#FFF" d="m75 0 244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0h75z"/><path fill="#C8102E" d="m424 288 216 159v33h-44L368 300l56-12zm-208-96L0 33V0h44l228 160-56 32zm384-192 40 30v4l-190 142h-48L598 0h2zm-598 448 40-30h48L64 480H0v-32z"/><path fill="#FFF" d="M240 0v480h160V0H240zM0 160v160h640V160H0z"/><path fill="#C8102E" d="M266 0v480h108V0H266zM0 186v108h640V186H0z"/></svg><span>EN</span></a>
+            <a class="lang-pill {% if page.lang == 'uk' %}active{% endif %}" href="{{ uk_url | relative_url }}" title="Українська версія"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><g fill-rule="evenodd" stroke-width="1pt"><path fill="#ffd700" d="M0 240h640v240H0z"/><path fill="#0057b7" d="M0 0h640v240H0z"/></g></svg><span>UK</span></a>
+            <a class="lang-pill {% if page.lang == 'ru' %}active{% endif %}" href="{{ ru_url | relative_url }}" title="Русская версия"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><g fill-rule="evenodd" stroke-width="1pt"><path fill="#fff" d="M0 0h640v160H0z"/><path fill="#0039a6" d="M0 160h640v160H0z"/><path fill="#d52b1e" d="M0 320h640v160H0z"/></g></svg><span>RU</span></a>
           </nav>
 
           <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="Toggle theme">
@@ -95,7 +111,7 @@
 
     <footer class="site-footer">
       <p>☕ <strong>Java Interview Questions and Answers</strong> · Open Source Knowledge Portal</p>
-      <p>Built from the <a href="{{ site.github.repository_url | default: 'https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers' }}" target="_blank" rel="noopener">GitHub repository</a>. Fully synced with Junior, Middle, and Senior levels.</p>
+      <p>Built from the <a href="{{ site.github.repository_url | default: 'https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers' }}" target="_blank" rel="noopener">GitHub repository</a>. Fully synced across English, Ukrainian, and Russian.</p>
     </footer>
 
     <script src="{{ '/assets/js/site.js' | relative_url }}"></script>

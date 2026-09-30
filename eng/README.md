@@ -653,8 +653,8 @@ eng/
 ## Language Versions
 
 - English version: [eng/README.md](README.md)
-- Russian version: [ru/README.md](../ru/README.md)
 - Ukrainian version: [ua/README.md](../ua/README.md)
+- Russian version: [ru/README.md](../ru/README.md)
 
 Each file contains answers at three difficulty levels:
 - 🟢 **Junior** — simple explanations, basic concepts

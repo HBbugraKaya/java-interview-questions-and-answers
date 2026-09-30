@@ -1,18 +1,26 @@
 ---
 layout: default
-title: Page not found
+title: 404 - Page Not Found
 description: The requested page could not be found.
 permalink: /404.html
 lang: en
 ---
 
-<section class="hero">
-  <span class="eyebrow">404</span>
-  <h1>That page is not here.</h1>
-  <p class="lede">The URL may have changed while the site structure is being expanded. Use the links below to continue from the main Java interview landing pages.</p>
-  <div class="hero-actions">
-    <a class="button button-primary" href="{{ '/' | relative_url }}">Open English Home</a>
-    <a class="button" href="{{ '/ru/' | relative_url }}">Open Russian Home</a>
-    <a class="button" href="{{ site.github.repository_url }}">Open GitHub Repository</a>
+<section class="hero-section">
+  <div class="hero-badge">
+    <span>⚠️ Error 404</span>
+  </div>
+  <h1 class="hero-title">Page Not Found</h1>
+  <p class="hero-subtitle">The page you are looking for might have been moved or renamed during our documentation updates. Use the options below to get back on track:</p>
+
+  <div class="hero-search-box">
+    <input type="text" class="hero-search-input" id="hero-search-input" placeholder="Search 500+ interview questions... (Ctrl+K)" readonly>
+    <svg class="hero-search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+  </div>
+
+  <div class="hero-actions" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+    <a class="meta-pill meta-pill-link" style="padding: 10px 20px; font-size: 0.95rem;" href="{{ '/' | relative_url }}"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><path fill="#012169" d="M0 0h640v480H0z"/><path fill="#FFF" d="m75 0 244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0h75z"/><path fill="#C8102E" d="m424 288 216 159v33h-44L368 300l56-12zm-208-96L0 33V0h44l228 160-56 32zm384-192 40 30v4l-190 142h-48L598 0h2zm-598 448 40-30h48L64 480H0v-32z"/><path fill="#FFF" d="M240 0v480h160V0H240zM0 160v160h640V160H0z"/><path fill="#C8102E" d="M266 0v480h108V0H266zM0 186v108h640V186H0z"/></svg> <span>English Home</span></a>
+    <a class="meta-pill meta-pill-link" style="padding: 10px 20px; font-size: 0.95rem;" href="{{ '/ru/' | relative_url }}"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><g fill-rule="evenodd" stroke-width="1pt"><path fill="#fff" d="M0 0h640v160H0z"/><path fill="#0039a6" d="M0 160h640v160H0z"/><path fill="#d52b1e" d="M0 320h640v160H0z"/></g></svg> <span>Главная (RU)</span></a>
+    <a class="meta-pill meta-pill-link" style="padding: 10px 20px; font-size: 0.95rem;" href="{{ '/uk/' | relative_url }}"><svg class="flag-svg" viewBox="0 0 640 480" aria-hidden="true"><g fill-rule="evenodd" stroke-width="1pt"><path fill="#ffd700" d="M0 240h640v240H0z"/><path fill="#0057b7" d="M0 0h640v240H0z"/></g></svg> <span>Головна (UK)</span></a>
   </div>
 </section>

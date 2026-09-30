@@ -1,18 +1,29 @@
+# IDE & Editors
 .idea/
 *.iml
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node / Dependencies
+node_modules/
+npm-debug.log*
+
+# Python / Caches
 __pycache__/
+*.pyc
+*.pyo
 
-.qwen/
-.playwright-cli/
-output/
-
-TRANSLATION_PROGRESS.md
-TRANSLATION_PROGRESS_UA.md
-
-eng/**/_PROGRESS.md
-eng/**/_translate.js
-eng/**/_batch_translate.py
-
+# Jekyll / Generated Site Pages
+_site/
+.jekyll-cache/
+.jekyll-metadata
 docs/questions/
 docs/ru/questions/
 docs/uk/questions/
+docs/sitemap.xml
+
+

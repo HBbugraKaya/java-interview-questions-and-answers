@@ -8,27 +8,27 @@ This repository is built as a **practical Java backend interview preparation sys
 ## Start Here
 
 - English landing page: [GitHub Pages / English](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/)
-- Russian landing page: [GitHub Pages / Russian](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/ru/)
 - Ukrainian landing page: [GitHub Pages / Ukrainian](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/uk/)
+- Russian landing page: [GitHub Pages / Russian](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/ru/)
 - English answer library: [Read answers on the site](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/questions/)
-- Russian answer library: [Читать ответы на сайте](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/ru/questions/)
 - Ukrainian answer library: [Читати відповіді на сайті](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/uk/questions/)
+- Russian answer library: [Читать ответы на сайте](https://viacheslavchernyshov.github.io/java-interview-questions-and-answers/ru/questions/)
 - English repository version: [eng/README.md](eng/README.md)
-- Russian repository version: [ru/README.md](ru/README.md)
 - Ukrainian repository version: [ua/README.md](ua/README.md)
+- Russian repository version: [ru/README.md](ru/README.md)
 
 ## Languages
 
 - English: [Full Java interview questions list](eng/README.md)
-- Russian: [Полный список вопросов по Java interview](ru/README.md)
 - Ukrainian: [Повний список питань для Java interview](ua/README.md)
+- Russian: [Полный список вопросов по Java interview](ru/README.md)
 
 ## Why This Repository Stands Out
 
 - Covers the most common Java backend interview topics in one place instead of scattering them across separate notes
 - Organizes questions by topic, so the repository works both as a roadmap and as a fast reference
 - Keeps every answer structured by level, from fundamentals to senior-level depth
-- Includes English, Russian, and Ukrainian public versions for easier study and wider reach
+- Includes English, Ukrainian, and Russian public versions for easier study and wider reach
 - Adds GitHub Pages topic hubs for faster browsing, better internal linking, and stronger search visibility
 
 ## Who This Helps
@@ -52,7 +52,7 @@ This repository is built as a **practical Java backend interview preparation sys
 - Pick one topic cluster that matches the role you are targeting, for example Spring Boot, SQL, Kafka, or Concurrency
 - Start from the answer library on the site or from the section navigator in GitHub, then move in order because many questions build on previous ones
 - Use the three-layer answer structure to calibrate how deep your own answer should sound in interviews
-- Switch between English, Russian, and Ukrainian versions depending on study comfort or publishing needs
+- Switch between English, Ukrainian, and Russian versions depending on study comfort or publishing needs
 
 ## English Question List
 
@@ -670,7 +670,7 @@ This repository is built as a **practical Java backend interview preparation sys
 | **Total questions**  | 500+                           |
 | **Total categories** | 20                             |
 | **Each answer has**  | 🟢 Junior + 🟡 Middle + 🔴 Senior |
-| **Languages**        | English, Russian, Ukrainian     |
+| **Languages**        | English, Ukrainian, Russian     |
 | **Formats**          | GitHub repository + GitHub Pages |
 
 ---
@@ -679,12 +679,11 @@ This repository is built as a **practical Java backend interview preparation sys
 
 ```
 README.md
-eng/    -> English markdown source
-ru/     -> Russian markdown source
-ua/     -> Ukrainian markdown source
-docs/   -> GitHub Pages SEO site
-assets/ -> social preview and supporting assets
-scripts/ -> local helper scripts
+eng/     -> English markdown source
+ua/      -> Ukrainian markdown source
+ru/      -> Russian markdown source
+docs/    -> GitHub Pages SEO site
+scripts/ -> site generation and helper scripts
 ```
 
 ---
@@ -692,8 +691,8 @@ scripts/ -> local helper scripts
 ## Language Versions
 
 - English repository version: [eng/README.md](eng/README.md)
-- Russian repository version: [ru/README.md](ru/README.md)
 - Ukrainian repository version: [ua/README.md](ua/README.md)
+- Russian repository version: [ru/README.md](ru/README.md)
 
 Each file contains answers at three depth levels:
 - 🟢 **Junior** — simple explanations and the core idea
